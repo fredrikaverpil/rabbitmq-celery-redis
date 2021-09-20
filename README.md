@@ -1,4 +1,4 @@
-# fastapi-rabbitmq-celery-redis
+# rabbitmq-celery-redis
 
 Purpose:
 
@@ -9,18 +9,32 @@ Purpose:
 Parts:
 
 * Message broker, message transport: RabbitMQ
-* Task worker: Celery
+* Task worker(s): Celery
 * Result store: Redis
+
+## Install
+
+```bash
+python -m venv .venv
+pip install -r requirements.txt
+```
 
 ## Run
 
 ```bash
-# start the broker
+# start the broker and redis
 docker compose up
 
-# start worker
-celery -A tasks worker -l info --pool=solo
+# start workers
+celery --app tasks worker --loglevel info --queues hello
+celery --app tasks worker --loglevel info --queues goodbye
 
-# Send task
+# send tasks
 python celery_app.py
+```
+
+One worker can process both queues (good for development):
+
+```bash
+celery --app tasks worker --loglevel info --queues hello,goodbye
 ```
